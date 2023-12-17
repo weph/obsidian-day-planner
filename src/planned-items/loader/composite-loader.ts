@@ -20,4 +20,8 @@ export default class CompositeLoader<T> implements PlannedItemLoader<T> {
 
     return result;
   }
+
+  refresh(): void {
+    this.taskLoaders.forEach((taskLoader) => taskLoader.refresh());
+  }
 }

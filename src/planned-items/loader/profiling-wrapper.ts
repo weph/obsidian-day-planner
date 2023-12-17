@@ -26,4 +26,8 @@ export class ProfilingWrapper<T> implements PlannedItemLoader<T> {
 
     return result;
   }
+
+  refresh(): void {
+    this.taskLoader.refresh();
+  }
 }

@@ -9,6 +9,7 @@ export type PlannedItem = STask | SListEntry;
 
 export interface PlannedItemLoader<T> {
   forDays(days: Set<Day>): Promise<Map<Day, Array<T>>>;
+  refresh(): void;
 }
 
 export class PlannedItems<T> {
@@ -22,7 +23,7 @@ export class PlannedItems<T> {
   public delayRefresh: () => void;
 
   constructor(
-    private plannedItems: PlannedItemLoader<T>,
+    private loader: PlannedItemLoader<T>,
     loadingDelayInMs: number,
   ) {
     [this.loadQueueDebounced, this.delayRefresh] = debounceWithDelay(
@@ -33,7 +34,7 @@ export class PlannedItems<T> {
 
   public refresh(): void {
     this.lastRefresh = new Date();
-
+    this.loader.refresh();
     this.active.forEach((day) => this.addDayToLoadingQueue(day));
   }
 
@@ -65,7 +66,7 @@ export class PlannedItems<T> {
 
     queue.forEach((day) => this.cacheDate.set(day, new Date()));
 
-    this.plannedItems.forDays(queue).then((value) =>
+    this.loader.forDays(queue).then((value) =>
       value.forEach((tasks, key) => {
         this.cacheUpdate.get(key)(tasks);
       }),

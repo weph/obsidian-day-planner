@@ -69,6 +69,7 @@ export function mapToTasksForDay(
   tasksForDay: STask[],
   settings: DayPlannerSettings,
 ) {
+  performance.mark("map-tasks-start");
   const [withTime, withoutTime] = partition(isTimeSetOnTask, tasksForDay);
 
   const tasksWithTime = withTime
@@ -93,6 +94,16 @@ export function mapToTasksForDay(
     .map((sTask: STask) => sTaskToUnscheduledTask(sTask, day));
 
   const withTimeAndDuration = calculateDuration(tasksWithTime, settings);
+
+  performance.mark("map-tasks-stop");
+
+  const measure = performance.measure(
+    "map-tasks-time",
+    "map-tasks-start",
+    "map-tasks-stop",
+  );
+
+  console.log(`mapToTasksForDay: ${measure.duration.toFixed(2)} ms`);
 
   return { withTime: withTimeAndDuration, noTime };
 }

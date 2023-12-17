@@ -24,6 +24,8 @@ class MockLoader implements PlannedItemLoader<string> {
   public setItems(day: Day, tasks: Array<string>) {
     this.items.set(day, tasks);
   }
+
+  refresh(): void {}
 }
 
 const loadingDelayInMs = 5;
