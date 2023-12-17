@@ -16,6 +16,7 @@ export function useVisibleTasks({ dataviewTasks }: UseVisibleTasksProps) {
   return derived(
     [visibleDays, dataviewTasks, settings],
     ([$visibleDays, $dataviewTasks, $settings]) => {
+      performance.mark("visible-tasks-start");
       // todo: make this simpler
       if ($dataviewTasks.length === 0) {
         return Object.fromEntries(
@@ -30,7 +31,7 @@ export function useVisibleTasks({ dataviewTasks }: UseVisibleTasksProps) {
           .array(),
       );
 
-      return $visibleDays.reduce<Record<string, TasksForDay>>((result, day) => {
+      const tasksForDays = $visibleDays.reduce<Record<string, TasksForDay>>((result, day) => {
         const key = getDayKey(day);
         const sTasksForDay = dayToSTasksLookup[key];
 
@@ -42,6 +43,21 @@ export function useVisibleTasks({ dataviewTasks }: UseVisibleTasksProps) {
 
         return result;
       }, {});
+
+      performance.mark("visible-tasks-end");
+
+      const measure = performance.measure(
+        "visible-tasks-time",
+        "visible-tasks-start",
+        "visible-tasks-end",
+      );
+
+      console.debug(
+        `obsidian-day-planner:
+  visible-tasks: ${measure.duration} ms`,
+      );
+
+      return tasksForDays;
     },
   );
 }
